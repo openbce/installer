@@ -1,0 +1,5 @@
+FROM alpine:3.15.4
+
+COPY kube-apiserver /usr/bin/kube-apiserver
+
+ENTRYPOINT /usr/bin/kube-apiserver 
