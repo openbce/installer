@@ -1,6 +1,7 @@
 K8S_VER=v1.24.1
 ETCD_VER=3.5.3-0
 DNS_VER=v1.8.6
+PAUSE_VER=3.7
 
 
 all: kube-apiserver kube-scheduler kube-controller-manager kube-proxy pause etcd coredns
@@ -18,11 +19,12 @@ kube-controller-manager:
 kube-proxy:
 	docker build bins -t xflops/kube-proxy:${K8S_VER} -f docker/Dockerfile.kube-proxy
 
-pause:
-	docker build bins -t xflops/pause:${K8S_VER} -f docker/Dockerfile.pause
-
 etcd:
 	docker build bins -t xflops/etcd:${ETCD_VER} -f docker/Dockerfile.etcd
 
 coredns:
 	docker build bins -t xflops/coredns:${DNS_VER} -f docker/Dockerfile.coredns
+
+pause:
+	docker build bins -t xflops/pause:${PAUSE_VER} -f docker/Dockerfile.pause
+
