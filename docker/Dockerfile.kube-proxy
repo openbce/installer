@@ -1,6 +1,6 @@
 FROM alpine:3.15.4
 
-RUN apk add iptables
+RUN apk add iptables ebtables socat conntrack
 COPY kube-proxy /usr/local/bin/kube-proxy
 
 ENTRYPOINT /usr/local/bin/kube-proxy
