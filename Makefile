@@ -20,10 +20,10 @@ kube-proxy:
 	docker build bins -t xflops/kube-proxy:${K8S_VER} -f docker/Dockerfile.kube-proxy
 
 kubeadm:
-	docker build bins -t xflops/kubeadm:${PAUSE_VER} -f docker/Dockerfile.kubeadm
+	docker build bins -t xflops/kubeadm:${K8S_VER} -f docker/Dockerfile.kubeadm
 
 kubelet:
-	docker build bins -t xflops/kubelet:${PAUSE_VER} -f docker/Dockerfile.kubelet
+	docker build bins -t xflops/kubelet:${K8S_VER} -f docker/Dockerfile.kubelet
 
 etcd:
 	docker build bins -t xflops/etcd:${ETCD_VER} -f docker/Dockerfile.etcd
