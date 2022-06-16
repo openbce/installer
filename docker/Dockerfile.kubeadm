@@ -1,5 +1,5 @@
 FROM alpine:3.15.4
 
-COPY kubelet /usr/bin/kubeadm
+COPY kubeadm /usr/bin/kubeadm
 
 ENTRYPOINT /usr/bin/kubeadm
