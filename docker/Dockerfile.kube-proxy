@@ -1,5 +1,6 @@
 FROM alpine:3.15.4
 
+RUN apk add iptables
 COPY kube-proxy /usr/local/bin/kube-proxy
 
 ENTRYPOINT /usr/local/bin/kube-proxy
