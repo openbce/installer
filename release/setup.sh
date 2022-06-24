@@ -2,14 +2,14 @@
 
 # install dependencies
 
-DEPS="ebtables socat conntrack containerd"
+XFLOPS_DEPS="ebtables socat conntrack containerd"
 
 if type apt >/dev/null 2>&1; then 
-  apt install -y ${DEPS}
+  apt install -y ${XFLOPS_DEPS}
 fi
 
 if type yum >/dev/null 2>&1; then 
-  yum install -y ${DPES}
+  yum install -y ${XFLOPS_DEPS}
 fi
 
 # Set up network environment
