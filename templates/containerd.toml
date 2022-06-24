@@ -1,5 +1,7 @@
 # /etc/containerd/config.toml
 
+root={{ XFLOPS_WORK_DIR }}/containerd
+
 [plugins]
   [plugins.cri]
     sandbox_image = "docker.io/xflops/pause:3.7"
