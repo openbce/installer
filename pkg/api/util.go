@@ -11,26 +11,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package api
 
 import (
-	"fmt"
+	"os"
 
-	kubeadmutil "k8s.io/kubernetes/cmd/kubeadm/app/util"
-
-	"xflops.cn/installer/cmd/app"
-	"xflops.cn/installer/pkg/api"
-	"xflops.cn/installer/pkg/phase/prepare"
+	"gopkg.in/yaml.v2"
 )
 
-func main() {
-	//	Read xflops.conf
-	conf := api.LoadConfiguration()
+func LoadConfiguration() *XflopsConfiguration {
+	conf := &XflopsConfiguration{}
 
-	if err := prepare.Execute(conf); err != nil {
-		fmt.Printf("Failed to setup environment: %v\n", err)
-		return
+	if y, err := os.ReadFile("xflops.yaml"); err != nil {
+		return nil
+	} else {
+		yaml.Unmarshal(y, conf)
 	}
 
-	kubeadmutil.CheckErr(app.Run(conf))
+	if conf.HomeDir == "" {
+		if wd, err := os.Getwd(); err != nil {
+			return nil
+		} else {
+			conf.HomeDir = wd
+		}
+	}
+
+	return conf
 }

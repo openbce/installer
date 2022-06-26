@@ -1,4 +1,3 @@
-
-export XFLOPS_HOME={{ XFLOPS_HOME }}
-export XFLOPS_WORK_DIR={{ XFLOPS_WORK_DIR }}
+export XFLOPS_HOME={{ .HomeDir }}
+export XFLOPS_WORK_DIR={{ .WorkDir }}
 export PATH=${XFLOPS_HOME}/bin:${XFLOPS_HOME}/sbin:${PATH}

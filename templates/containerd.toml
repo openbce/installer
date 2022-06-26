@@ -1,6 +1,6 @@
 # /etc/containerd/config.toml
 
-root={{ XFLOPS_WORK_DIR }}/containerd
+root="{{ .WorkDir }}/containerd"
 
 [plugins]
   [plugins.cri]

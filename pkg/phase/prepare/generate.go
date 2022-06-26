@@ -11,26 +11,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package prepare
 
 import (
+	"fmt"
 	"html/template"
 	"os"
+	"path/filepath"
+
+	"xflops.cn/installer/pkg/api"
 )
 
 var templates = map[string]string{
 	"templates/containerd.toml": "/etc/containerd/config.toml",
 	"templates/kubelet.service": "/etc/systemd/system/kubelet.service",
-	"tempaltes/xflops_envs.csh": "env/xflops.csh",
+	"templates/xflops_envs.csh": "env/xflops.csh",
 	"templates/xflops_envs.sh":  "env/xflops.sh",
 }
 
-func generateFiles(conf *XflopsConfiguration) error {
-	data := map[string]string{
-		"XFLOPS_WORK_DIR": conf.WorkDir,
-		"XFLOPS_HOME_DIR": conf.HomeDir,
-	}
-
+func generateFiles(conf *api.XflopsConfiguration) error {
 	for k, v := range templates {
 		t1, err := template.ParseFiles(k)
 		if err != nil {
@@ -38,12 +37,16 @@ func generateFiles(conf *XflopsConfiguration) error {
 		}
 
 		if err = func() error {
+			if err := os.MkdirAll(filepath.Dir(v), 0644); err != nil {
+				return fmt.Errorf("failed to create parent directory of %s", v)
+			}
 			f, err := os.OpenFile(v, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
+			defer f.Close()
 			if err != nil {
 				return err
 			}
 
-			t1.Execute(f, data)
+			t1.Execute(f, &conf)
 
 			return nil
 		}(); err != nil {

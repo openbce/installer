@@ -11,15 +11,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package prepare
 
 import (
 	"fmt"
 	"os"
 	"os/exec"
+
+	"xflops.cn/installer/pkg/api"
 )
 
-var modules = []string{"overlay", "nbr_netfilter"}
+var modules = []string{"overlay", "br_netfilter"}
 
 var sysctls = map[string]string{
 	"net.bridge.bridge-nf-call-iptables":  "1",
@@ -27,7 +29,7 @@ var sysctls = map[string]string{
 	"net.ipv4.ip_forward":                 "1",
 }
 
-func createNetworkConf(_ *XflopsConfiguration) error {
+func createNetworkConf(_ *api.XflopsConfiguration) error {
 	modFile, err := os.OpenFile("/etc/modules-load.d/xflops.conf", os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0644)
 	defer modFile.Close()
 	if err != nil {
@@ -55,7 +57,7 @@ func createNetworkConf(_ *XflopsConfiguration) error {
 	return nil
 }
 
-func setupNetwork(conf *XflopsConfiguration) error {
+func setupNetwork(conf *api.XflopsConfiguration) error {
 	if err := createNetworkConf(conf); err != nil {
 		return err
 	}
@@ -63,31 +65,14 @@ func setupNetwork(conf *XflopsConfiguration) error {
 	for _, m := range modules {
 		cmd := exec.Command("modprobe", m)
 		if err := cmd.Run(); err != nil {
-			return err
+			return fmt.Errorf("failed to run <modprobe %s>: %v", m, err)
 		}
 	}
 
 	cmd := exec.Command("sysctl", "--system")
 	if err := cmd.Run(); err != nil {
-		return err
+		return fmt.Errorf("failed to run sysctl: %v", err)
 	}
-
-	// cat <<EOF | tee /etc/modules-load.d/xflops.conf
-	//  overlay
-	//  br_netfilter
-	// EOF
-
-	// sudo modprobe overlay
-	// sudo modprobe br_netfilter
-
-	// # sysctl params required by setup, params persist across reboots
-	// cat <<EOF | tee /etc/sysctl.d/k8s.conf
-	// net.bridge.bridge-nf-call-iptables  = 1
-	// net.bridge.bridge-nf-call-ip6tables = 1
-	// net.ipv4.ip_forward                 = 1
-	// EOF
-	// sysctl --system
-	//
 
 	return nil
 }

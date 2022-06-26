@@ -11,26 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package api
 
-import (
-	"fmt"
-
-	kubeadmutil "k8s.io/kubernetes/cmd/kubeadm/app/util"
-
-	"xflops.cn/installer/cmd/app"
-	"xflops.cn/installer/pkg/api"
-	"xflops.cn/installer/pkg/phase/prepare"
-)
-
-func main() {
-	//	Read xflops.conf
-	conf := api.LoadConfiguration()
-
-	if err := prepare.Execute(conf); err != nil {
-		fmt.Printf("Failed to setup environment: %v\n", err)
-		return
-	}
-
-	kubeadmutil.CheckErr(app.Run(conf))
+type XflopsConfiguration struct {
+	WorkDir           string `yaml:"work-dir"`
+	HomeDir           string `yaml:"home-dir"`
+	Repository        string `yaml:"image-repository"`
+	PodCIDR           string `yaml:"pod-network-cidr"`
+	APIAddress        string `yaml:"apiserver-advertise-address"`
+	ServiceCIDR       string `yaml:"service-cidr"`
+	KubernetesVersion string `yaml:"kubernetes-version"`
 }
