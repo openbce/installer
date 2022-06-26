@@ -167,7 +167,6 @@ func NewJoinCMD(out io.Writer, joinOptions *joinOptions) *cobra.Command {
 		Short: "Run this on any machine you wish to join an existing cluster",
 		Long:  joinLongDescription,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			c, err := joinRunner.InitData(args)
 			if err != nil {
 				return err

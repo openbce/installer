@@ -17,8 +17,12 @@ limitations under the License.
 package cmd
 
 import (
+	"crypto/x509"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"strings"
+
 	"os"
 	"path/filepath"
 	"text/template"
@@ -30,7 +34,8 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientset "k8s.io/client-go/kubernetes"
-
+	"k8s.io/client-go/tools/clientcmd"
+	clientcertutil "k8s.io/client-go/util/cert"
 	kubeadmapi "k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm"
 	kubeadmscheme "k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/scheme"
 	kubeadmapiv1 "k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm/v1beta3"
@@ -46,6 +51,7 @@ import (
 	"k8s.io/kubernetes/cmd/kubeadm/app/util/apiclient"
 	configutil "k8s.io/kubernetes/cmd/kubeadm/app/util/config"
 	kubeconfigutil "k8s.io/kubernetes/cmd/kubeadm/app/util/kubeconfig"
+	"k8s.io/kubernetes/cmd/kubeadm/app/util/pubkeypin"
 
 	"xflops.cn/installer/pkg/api"
 )
@@ -607,9 +613,68 @@ func showJoinCommand(i *initData, out io.Writer) error {
 
 	// Prints the join command, multiple times in case the user has multiple tokens
 	for _, token := range i.Tokens() {
+		if err := persistData(adminKubeConfigPath, token, i); err != nil {
+			return errors.Wrap(err, "failed to persist init data")
+		}
 		if err := printJoinCommand(out, adminKubeConfigPath, token, i); err != nil {
 			return errors.Wrap(err, "failed to print join command")
 		}
+	}
+
+	return nil
+}
+
+func persistData(kubeConfigFile, token string, i *initData) error {
+	// load the kubeconfig file to get the CA certificate and endpoint
+	config, err := clientcmd.LoadFromFile(kubeConfigFile)
+	if err != nil {
+		return errors.Wrap(err, "failed to load kubeconfig")
+	}
+
+	// load the default cluster config
+	clusterConfig := kubeconfigutil.GetClusterFromKubeConfig(config)
+	if clusterConfig == nil {
+		return errors.New("failed to get default cluster config")
+	}
+
+	// load CA certificates from the kubeconfig (either from PEM data or by file path)
+	var caCerts []*x509.Certificate
+	if clusterConfig.CertificateAuthorityData != nil {
+		caCerts, err = clientcertutil.ParseCertsPEM(clusterConfig.CertificateAuthorityData)
+		if err != nil {
+			return errors.Wrap(err, "failed to parse CA certificate from kubeconfig")
+		}
+	} else if clusterConfig.CertificateAuthority != "" {
+		caCerts, err = clientcertutil.CertsFromFile(clusterConfig.CertificateAuthority)
+		if err != nil {
+			return errors.Wrap(err, "failed to load CA certificate referenced by kubeconfig")
+		}
+	} else {
+		return errors.New("no CA certificates found in kubeconfig")
+	}
+
+	// hash all the CA certs and include their public key pins as trusted values
+	publicKeyPins := make([]string, 0, len(caCerts))
+	for _, caCert := range caCerts {
+		publicKeyPins = append(publicKeyPins, pubkeypin.Hash(caCert))
+	}
+
+	homedir := os.Getenv("XFLOPS_HOME") + "/data"
+	if err := os.MkdirAll(homedir, 0755); err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile(homedir+"/token", []byte(token), 0644); err != nil {
+		return err
+	}
+	if err := ioutil.WriteFile(homedir+"/cahash", []byte(publicKeyPins[0]), 0644); err != nil {
+		return err
+	}
+
+	if err := ioutil.WriteFile(homedir+"/controlpane",
+		[]byte(strings.Replace(clusterConfig.Server,
+			"https://", "", -1)), 0644); err != nil {
+		return err
 	}
 
 	return nil

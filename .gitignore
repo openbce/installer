@@ -2,4 +2,5 @@ xflops-installer
 bin/
 sbin/
 env/
+data/
 .idea/
