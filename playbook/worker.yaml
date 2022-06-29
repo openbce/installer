@@ -1,0 +1,15 @@
+---
+- name: Install XFLOPS workers
+  hosts: workers
+  vars_files:
+    - ../xflops.yaml
+  tasks:
+    - name: Pull Images
+      shell: kubeadm config images pull  \
+        --kubernetes-version={{ k8s_version }} \
+        --image-repository={{ image_repository }}
+
+#    - name: Install Kubernetes Worker
+#      shell: kubeadm join {{ master }}\
+#        --token={{ worker_token }} \
+#        --discovery-token-ca-cert-hash={{ worker_ca_hash }}

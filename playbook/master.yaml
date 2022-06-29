@@ -1,0 +1,21 @@
+---
+- name: Install XFLOPS master
+  hosts: masters
+  vars_files:
+    - ../xflops.yaml
+  tasks:
+    - name: Pull Images
+      shell: kubeadm config images pull  \
+          --kubernetes-version={{ k8s_version }} \
+          --image-repository={{ image_repository }}
+
+    - name: Install Kubernetes Master
+      shell: kubeadm init \
+        --kubernetes-version={{ k8s_version }} \
+        --image-repository={{ image_repository }} \
+        --pod-network-cidr={{ pod_cidr }} \
+        --apiserver-advertise-address={{ inventory_hostname }} \
+        --service-cidr={{ service_cidr }}
+
+    - name: Install Calico
+      shell: kubectl apply --kubeconfig /etc/kubernetes/admin.conf -f templates/calico.yaml

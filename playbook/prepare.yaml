@@ -1,0 +1,48 @@
+---
+- name: Prepare environment for XFLOPS
+  hosts: all
+  vars_files:
+    - ../xflops.yaml
+  vars:
+    dep_items: ["socat", "conntrack", "ebtables", "containerd"]
+    sbin_items: ["kubelet", "crictl", "kubectl", "kubeadm"]
+    mod_items: ["overlay", "br_netfilter"]
+  tasks:
+  - name: Make working directory
+    file: path={{work_dir}} state=directory mode=0755
+  # Deploy XFLOPS binaries
+  - name: Deploy binaries
+    copy: src=../sbin/{{ item }} dest=/usr/bin/{{ item }} owner=root group=root mode=0755
+    with_items: "{{ sbin_items }}"
+
+  # Set up network
+  - name: Install Network dependencies
+    apt: name={{ item }} state=present
+    with_items: "{{ dep_items }}"
+  - name: Copy XFLOPS modules
+    copy: src=templates/xflops.modules dest=/etc/modules-load.d/xflops.conf owner=root group=root mode=0644
+  - name: Copy XFLOPS sysctl
+    copy: src=templates/xflops.sysctl dest=/etc/sysctl.d/xflops.conf owner=root group=root mode=0644
+  - name: Enable XFLOPS modules
+    shell: modprobe {{ item }}
+    with_items: "{{ mod_items }}"
+  - name: Enable XFLOPS sysctl
+    shell: sysctl --system
+
+    # Setup containerd
+  - name: Make containerd configuration directory
+    file: path=/etc/containerd state=directory mode=0755
+  - name: Update containerd configuration
+    template: src=templates/containerd.toml.j2 dest=/etc/containerd/config.toml
+  - name: Enable containerd
+    service: name=containerd enabled=yes
+  - name: Restart containerd
+    service: name=containerd state=restarted
+
+  # Setup kubelet
+  - name: Copy kubelet service
+    copy: src=templates/kubelet.service dest=/etc/systemd/system/kubelet.service owner=root group=root mode=0644
+  - name: Enable kubelet
+    service: name=kubelet enabled=yes
+  - name: Restart kubelet
+    service: name=kubelet state=restarted

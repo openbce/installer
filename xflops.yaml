@@ -1,7 +1,6 @@
-xflops-version: 1.0
-kubernetes-version: 1.24.1
-work-dir: /scrap/users/klausm
-image-repository: docker.io/xflops
-pod-network-cidr: 172.88.0.0/16
-apiserver-advertise-address: 10.0.0.10
-service-cidr: 172.96.0.0/12
+xflops_version: 1.0
+k8s_version: 1.24.1
+work_dir: /scrap/users/klausm
+image_repository: docker.io/xflops
+pod_cidr: 172.88.0.0/16
+service_cidr: 172.96.0.0/12
