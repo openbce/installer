@@ -4,6 +4,9 @@
   vars_files:
     - ../xflops.yaml
   tasks:
+    - name: Uninstall Old Kubernetes
+      shell: kubeadm reset --force
+
     - name: Pull Images
       shell: kubeadm config images pull  \
           --kubernetes-version={{ k8s_version }} \
@@ -17,5 +20,14 @@
         --apiserver-advertise-address={{ inventory_hostname }} \
         --service-cidr={{ service_cidr }}
 
+    - name: Generate Worker tokens
+      shell: kubeadm token create $(kubeadm token generate) --print-join-command > /etc/kubernetes/worker.conf
+
+    - name: Save worker join command
+      fetch: src=/etc/kubernetes/worker.conf dest={{ playbook_dir }}/worker.conf flat=yes
+
     - name: Install Calico
-      shell: kubectl apply --kubeconfig /etc/kubernetes/admin.conf -f templates/calico.yaml
+      shell: kubectl apply --kubeconfig /etc/kubernetes/admin.conf -f {{ playbook_dir }}/templates/calico.yaml
+
+    - name: Install mpi-operator
+      shell: kubectl apply --kubeconfig /etc/kubernetes/admin.conf -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.4.0"
