@@ -1,0 +1,15 @@
+#!/bin/bash
+
+for i in "prepare" "master" "worker"
+do
+  ansible-playbook -i invetory/hosts playbook/${i}.yaml
+
+  if [ $? -ne 0 ]; then
+      exit 1
+  fi
+done
+
+#
+#ansible-playbook -i invetory/hosts playbook/prepare.yaml
+#ansible-playbook -i invetory/hosts playbook/master.yaml
+#ansible-playbook -i invetory/hosts playbook/worker.yaml

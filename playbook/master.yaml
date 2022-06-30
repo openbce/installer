@@ -2,7 +2,7 @@
 - name: Install XFLOPS master
   hosts: masters
   vars_files:
-    - ../xflops.yaml
+    - ../cbe.yaml
   tasks:
     - name: Uninstall Old Kubernetes
       shell: kubeadm reset --force

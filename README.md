@@ -2,16 +2,20 @@
 
 ## Steps
 
-### Run `init` command on master nodes
+### Update `hosts` list accordingly
 
 ```
-xflops-installer init
+[masters]
+10.0.0.10
+
+[workers]
+10.0.0.11
 ```
 
-### Run `join` command on all worker nodes
+### Execute installer command on bootstrap nodes
 
 ```
-xflops-installer join
+sudo cbe-installer
 ```
 
 ## Configurations
