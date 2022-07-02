@@ -2,7 +2,7 @@
 - name: Prepare environment for XFLOPS
   hosts: all
   vars_files:
-    - ../cbe.yaml
+    - ../bce.yaml
   vars:
     dep_items: ["socat", "conntrack", "ebtables", "containerd"]
     sbin_items: ["kubelet", "crictl", "kubectl", "kubeadm"]
@@ -19,9 +19,9 @@
   - name: Install Network dependencies
     package: name="{{ dep_items }}" state=present
   - name: Copy XFLOPS modules
-    copy: src=templates/cbe.modules dest=/etc/modules-load.d/cbe.conf owner=root group=root mode=0644
+    copy: src=templates/bce.modules dest=/etc/modules-load.d/bce.conf owner=root group=root mode=0644
   - name: Copy XFLOPS sysctl
-    copy: src=templates/cbe.sysctl dest=/etc/sysctl.d/cbe.conf owner=root group=root mode=0644
+    copy: src=templates/bce.sysctl dest=/etc/sysctl.d/bce.conf owner=root group=root mode=0644
   - name: Enable XFLOPS modules
     shell: modprobe {{ item }}
     with_items: "{{ mod_items }}"

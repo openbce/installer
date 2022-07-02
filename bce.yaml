@@ -1,6 +1,6 @@
 xflops_version: 1.0
 k8s_version: 1.24.1
 work_dir: /scrap/users/klausm
-image_repository: docker.io/xflops
+image_repository: docker.io/openbce
 pod_cidr: 172.88.0.0/16
 service_cidr: 172.96.0.0/12

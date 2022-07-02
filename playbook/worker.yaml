@@ -2,7 +2,7 @@
 - name: Install XFLOPS workers
   hosts: workers
   vars_files:
-    - ../cbe.yaml
+    - ../bce.yaml
   vars:
     - worker_join_cmd: "{{ lookup('file', 'worker.conf') }}"
   tasks:

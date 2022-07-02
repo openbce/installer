@@ -24,7 +24,7 @@ sudo cbe-installer
 xflops-version: 1.0
 kubernetes-version: 1.24.1
 work_dir: /scrap/users/klausm
-image-repository: docker.io/xflops
+image-repository: docker.io/openbce
 pod-network-cidr: 172.88.0.0/16
 apiserver-advertise-address: 10.210.0.125
 service-cidr: 172.96.0.0/12
