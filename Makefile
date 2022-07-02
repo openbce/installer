@@ -1,7 +1,11 @@
+BCE_VER=v0.1.0
 K8S_VER=v1.24.1
 ETCD_VER=3.5.3-0
 DNS_VER=v1.8.6
 PAUSE_VER=3.7
+
+REL_PKGS="invetory sbin playbook bce.yaml bce-installer"
+REL_NAME=${BCE_VER}-linux-`uname -m`
 
 docker-build: kube-apiserver kube-scheduler kube-controller-manager kube-proxy pause etcd coredns
 
@@ -31,3 +35,14 @@ coredns:
 
 pause:
 	docker build sbin -t openbce/pause:${PAUSE_VER} -f docker/Dockerfile.pause
+
+release:
+	mkdir -p build/bce-${BCE_VER}
+	for number in ${REL_PKGS} ; do \
+        cp -R $$number build/bce-${BCE_VER}/ ; \
+    done
+	tar cvf build/bce-${REL_NAME}.tar -C build bce-${BCE_VER}
+	gzip build/bce-${REL_NAME}.tar
+
+clean:
+	rm -rf build

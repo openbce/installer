@@ -1,5 +1,5 @@
 ---
-- name: Install XFLOPS master
+- name: Install openBCE master
   hosts: masters
   vars_files:
     - ../bce.yaml

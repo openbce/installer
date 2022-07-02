@@ -1,5 +1,5 @@
 ---
-- name: Prepare environment for XFLOPS
+- name: Prepare environment for openBCE
   hosts: all
   vars_files:
     - ../bce.yaml
@@ -10,7 +10,7 @@
   tasks:
   - name: Make working directory
     file: path={{work_dir}} state=directory mode=0755
-  # Deploy XFLOPS binaries
+  # Deploy openBCE binaries
   - name: Deploy binaries
     copy: src=../sbin/{{ item }} dest=/usr/bin/{{ item }} owner=root group=root mode=0755
     with_items: "{{ sbin_items }}"
@@ -18,14 +18,14 @@
   # Set up network
   - name: Install Network dependencies
     package: name="{{ dep_items }}" state=present
-  - name: Copy XFLOPS modules
+  - name: Copy openBCE modules
     copy: src=templates/bce.modules dest=/etc/modules-load.d/bce.conf owner=root group=root mode=0644
-  - name: Copy XFLOPS sysctl
+  - name: Copy openBCE sysctl
     copy: src=templates/bce.sysctl dest=/etc/sysctl.d/bce.conf owner=root group=root mode=0644
-  - name: Enable XFLOPS modules
+  - name: Enable openBCE modules
     shell: modprobe {{ item }}
     with_items: "{{ mod_items }}"
-  - name: Enable XFLOPS sysctl
+  - name: Enable openBCE sysctl
     shell: sysctl --system
 
     # Setup containerd

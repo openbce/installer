@@ -1,5 +1,5 @@
 ---
-- name: Install XFLOPS workers
+- name: Install openBCE workers
   hosts: workers
   vars_files:
     - ../bce.yaml
