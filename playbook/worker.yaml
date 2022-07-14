@@ -9,10 +9,5 @@
     - name: Uninstall Old Kubernetes
       shell: kubeadm reset --force
 
-    - name: Pull Images
-      shell: kubeadm config images pull  \
-        --kubernetes-version={{ k8s_version }} \
-        --image-repository={{ image_repository }}
-
     - name: Install Worker
       shell: "{{ worker_join_cmd }}"
