@@ -20,14 +20,18 @@
         --apiserver-advertise-address={{ inventory_hostname }} \
         --service-cidr={{ service_cidr }}
 
+- name: Fetch openBCE master config
+  hosts: masters[0]
+  vars_files:
+    - ../bce.yaml
+  tasks:
     - name: Generate Worker tokens
       shell: kubeadm token create $(kubeadm token generate) --print-join-command > /etc/kubernetes/worker.conf
 
-    - name: Save worker join command
-      fetch: src=/etc/kubernetes/worker.conf dest={{ playbook_dir }}/worker.conf flat=yes
+    - name: Fetch worker join command
+      fetch: src=/etc/kubernetes/worker.conf dest={{ playbook_dir }}/config/worker-join.conf flat=yes
 
-    - name: Install Calico
-      shell: kubectl apply --kubeconfig /etc/kubernetes/admin.conf -f {{ playbook_dir }}/templates/calico.yaml
+    - name: Fetch kubeconfig
+      fetch: src=/etc/kubernetes/admin.conf dest={{ playbook_dir }}/config/kube.config flat=yes
 
-    - name: Install mpi-operator
-      shell: kubectl apply --kubeconfig /etc/kubernetes/admin.conf -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.4.0"
+

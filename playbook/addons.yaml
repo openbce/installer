@@ -1,0 +1,11 @@
+---
+- name: Install openBCE addons
+  hosts: localhost
+  vars_files:
+    - ../bce.yaml
+  tasks:
+    - name: Install Calico
+      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f {{ playbook_dir }}/templates/calico.yaml
+
+    - name: Install mpi-operator
+      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.4.0" 

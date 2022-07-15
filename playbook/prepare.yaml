@@ -15,6 +15,10 @@
     copy: src=../sbin/{{ item }} dest=/usr/bin/{{ item }} owner=root group=root mode=0755
     with_items: "{{ sbin_items }}"
 
+  - name: Disable swap for kubelet
+    command: swapoff -a
+    become: true
+
   # Set up network
   - name: Install Network dependencies
     package: name="{{ dep_items }}" state=present

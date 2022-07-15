@@ -4,7 +4,7 @@
   vars_files:
     - ../bce.yaml
   vars:
-    - worker_join_cmd: "{{ lookup('file', 'worker.conf') }}"
+    - worker_join_cmd: "{{ lookup('file', 'config/worker-join.conf') }}"
   tasks:
     - name: Uninstall Old Kubernetes
       shell: kubeadm reset --force
