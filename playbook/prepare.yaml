@@ -5,8 +5,8 @@
     - ../bce.yaml
   vars:
     dep_items: ["socat", "conntrack", "ebtables", "containerd"]
-    sbin_items: ["kubelet", "crictl", "kubectl", "kubeadm"]
-    mod_items: ["overlay", "br_netfilter"]
+    sbin_items: ["kubelet", "crictl", "kubectl", "kubeadm", "clusterctl"]
+    mod_items: ["overlay", "br_netfilter", "nf_conntrack_tftp", "nf_nat_tftp"]
   tasks:
   - name: Make working directory
     file: path={{work_dir}} state=directory mode=0755

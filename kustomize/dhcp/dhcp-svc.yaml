@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dhcp
+  name: dhcp-service
+  namespace: default
+spec:
+  ports:
+  - name: dhcp-67
+    port: 67
+    protocol: UDP
+    targetPort: 67
+  - name: dhcp-68
+    port: 68
+    protocol: UDP
+    targetPort: 68
+  - name: tftp
+    port: 69
+    protocol: UDP
+    targetPort: 69
+  selector:
+    app: dhcp
+  type: LoadBalancer

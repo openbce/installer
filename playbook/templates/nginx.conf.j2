@@ -1,0 +1,60 @@
+
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
+
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
+
+events {
+    worker_connections 1024;
+}
+
+stream {
+    upstream dhcp_67_servers {
+        least_conn;
+{% for host in groups['masters'] %}
+        server {{ host }}:30067;
+{% endfor %}
+{% for host in groups['workers'] %}
+        server {{ host }}:30067;
+{% endfor %}
+    }
+
+    server {
+        listen 67 udp;
+        proxy_pass dhcp_67_servers;
+    }
+
+    upstream dhcp_68_servers {
+        least_conn;
+{% for host in groups['masters'] %}
+        server {{ host }}:30068;
+{% endfor %}
+{% for host in groups['workers'] %}
+        server {{ host }}:30068;
+{% endfor %}
+    }
+
+    server {
+        listen 68 udp;
+        proxy_pass dhcp_68_servers;
+    }
+
+    upstream tftp_servers {
+        least_conn;
+{% for host in groups['masters'] %}
+        server {{ host }}:30069;
+{% endfor %}
+{% for host in groups['workers'] %}
+        server {{ host }}:30069;
+{% endfor %}
+    }
+
+    server {
+        listen 69 udp;
+        proxy_pass tftp_servers;
+    }
+}
+
