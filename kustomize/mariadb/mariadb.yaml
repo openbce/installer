@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment # Create a deployment
+metadata:
+  name: mariadb # Set the name of the deployment
+spec:
+  replicas: 1 # Set 3 deployment replicas
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:10.7 # Docker image
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 3306 # Exposing the container port 3306 for MariaDB client connections.
+          envFrom:
+            - configMapRef:
+                name: mariadb-secret # Using the ConfigMap mariadb-secret
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mariadb-data
+      volumes:
+        - name: mariadb-data
+          hostPath:
+            path: /home/klausm/bce/installer/work/mariadb

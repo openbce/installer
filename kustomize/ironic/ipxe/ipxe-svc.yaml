@@ -2,8 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: dhcp
-  name: dhcp-service
+    app: ipxe
+  name: ipxe-svc
   namespace: default
 spec:
   ports:
@@ -19,6 +19,9 @@ spec:
     port: 69
     protocol: UDP
     targetPort: 69
+  - name: http
+    port: 8080
+    targetPort: 8080
   selector:
-    app: dhcp
+    app: ipxe
   type: LoadBalancer

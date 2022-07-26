@@ -10,8 +10,8 @@
 #     - name: Install mpi-operator
 #       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.4.0" 
 # 
-#     - name: Create namespace for baremetal-operator
-#       shell: ../sbin/kubectl create --kubeconfig {{ playbook_dir }}/config/kube.config namespace baremetal-operator-system
+    - name: Create namespace for baremetal-operator
+      shell: ../sbin/kubectl create --kubeconfig {{ playbook_dir }}/config/kube.config namespace baremetal-operator-system
 # 
 #     - name: Create cert-manager
 #       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f https://github.com/jetstack/cert-manager/releases/download/v1.5.4/cert-manager.yaml
@@ -35,7 +35,9 @@
     - name: Install Metallb
       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/metallb
 
-    - name: Install dhcp/tftp
-      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/dhcp
+    - name: Install MariaDB
+      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/mariadb
 
+    - name: Install Ironic
+      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/ironic
 

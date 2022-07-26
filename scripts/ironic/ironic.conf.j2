@@ -1,0 +1,144 @@
+[DEFAULT]
+auth_strategy = noauth
+debug = false
+default_deploy_interface = direct
+default_inspect_interface = inspector
+default_network_interface = noop
+enabled_bios_interfaces = idrac-wsman,no-bios,redfish,idrac-redfish,irmc,ilo
+enabled_boot_interfaces = ipxe,ilo-ipxe,pxe,ilo-pxe,fake,redfish-virtual-media,idrac-redfish-virtual-media,ilo-virtual-media
+enabled_deploy_interfaces = direct,fake,ramdisk,custom-agent
+# NOTE(dtantsur): when changing this, make sure to update the driver
+# dependencies in Dockerfile.
+enabled_hardware_types = dpu,ipmi,idrac,irmc,fake-hardware,redfish,ibmc,manual-management,ilo,ilo5
+enabled_inspect_interfaces = inspector,idrac,irmc,fake,redfish,ilo
+enabled_management_interfaces = ipmitool,idrac,irmc,fake,redfish,idrac-redfish,ibmc,ilo,ilo5,noop
+enabled_power_interfaces = dpu,ipmitool,idrac,irmc,fake,redfish,idrac-redfish,ibmc,ilo
+enabled_raid_interfaces = no-raid,irmc,agent,fake,ibmc,idrac-wsman,ilo5
+enabled_vendor_interfaces = no-vendor,ipmitool,idrac,idrac-redfish,redfish,ilo,fake,ibmc
+
+rpc_transport = none
+use_stderr = true
+hash_ring_algorithm = sha256
+my_ip = {{ env.IRONIC_HOST_IP }}
+host = {{ env.IRONIC_HOST_IP }}
+
+webserver_verify_ca = false
+
+isolinux_bin = /usr/share/syslinux/isolinux.bin
+
+# NOTE(dtantsur): this path is specific to the GRUB image that is built into
+# the ESP provided in [conductor]bootloader.
+grub_config_path = EFI/centos/grub.cfg
+
+[agent]
+deploy_logs_collect = always
+deploy_logs_local_path = /shared/log/ironic/deploy
+# NOTE(dtantsur): in some environments temporary networking issues can cause
+# the whole deployment to fail on inability to reach the ramdisk. Increasing
+# retries here works around such problems without affecting the normal path.
+# See https://bugzilla.redhat.com/show_bug.cgi?id=1822763
+max_command_attempts = 30
+
+[api]
+host_ip = {{ env.IRONIC_HOST_IP }}
+api_workers = 2
+
+[conductor]
+automated_clean = true
+# NOTE(dtantsur): keep aligned with [pxe]boot_retry_timeout below.
+deploy_callback_timeout = 4800
+send_sensor_data = true
+# NOTE(TheJulia): Do not lower this value below 120 seconds.
+# Power state is checked every 60 seconds and BMC activity should
+# be avoided more often than once every sixty seconds.
+send_sensor_data_interval = 160
+bootloader = http://{{ env.IPXE_PUBLIC_IP }}:{{ env.IPXE_HTTP_PORT }}/uefi_esp.img
+verify_step_priority_override = management.clear_job_queue:90
+# We don't use this feature, and it creates an additional load on the database
+node_history = False
+# Provide for a timeout longer than 60 seconds for certain vendor's hardware
+power_state_change_timeout = 120
+
+[database]
+connection = mysql+pymysql://ironic:{{ env.MARIADB_PASSWORD }}@mariadb-svc.mariadb-system.svc.cluster.local/ironic?charset=utf8
+
+[deploy]
+default_boot_option = local
+erase_devices_metadata_priority = 10
+erase_devices_priority = 0
+fast_track = true
+http_root = {{ env.IRONIC_HOME }}/images/httpboot
+http_url = http://{{ env.IPXE_HOST_IP }}:{{ env.IPXE_HTTP_PORT }}
+external_http_url = http://{{ env.IPXE_PUBLIC_IP }}:{{ env.IPXE_HTTP_PORT }}
+
+[dhcp]
+dhcp_provider = none
+
+[inspector]
+endpoint_override = {{ env.IRONIC_HOST_IP }}
+power_off = false
+
+# NOTE(dtantsur): keep inspection arguments synchronized with inspector.ipxe
+# Also keep in mind that only parameters unique for inspection go here.
+# No need to duplicate pxe_append_params/kernel_append_params.
+extra_kernel_params = ipa-inspection-collectors=default,extra-hardware,logs ipa-inspection-dhcp-all-interfaces=1 ipa-collect-lldp=1
+
+[ipmi]
+# use_ipmitool_retries transfers the responsibility of retrying to ipmitool
+# when supported. If set to false, then ipmitool is called as follows :
+#    $ipmitool -R 1 -N 1 ...
+# and Ironic handles the retry loop.
+use_ipmitool_retries = false
+# The following parameters are the defaults in Ironic. They are used in the
+# following way if use_ipmitool_retries is set to true:
+#    $ipmitool -R <X> -N <Y> ...
+# where :
+#    X = command_retry_timeout / min_command_interval
+#    Y = min_command_interval
+# If use_ipmitool_retries is false, then ironic retries X times, with an
+# interval of Y in between each tries.
+min_command_interval = 5
+command_retry_timeout = 60
+# List of possible cipher suites versions that can be
+# supported by the hardware in case the field `cipher_suite`
+# is not set for the node. (list value)
+cipher_suite_versions = 3,17
+
+host_ip = {{ env.IRONIC_HOST_IP }}
+
+[oslo_messaging_notifications]
+driver = prometheus_exporter
+location = /shared/ironic_prometheus_exporter
+transport_url = fake://
+
+[pxe]
+# NOTE(dtantsur): keep this value at least 3x lower than
+# [conductor]deploy_callback_timeout so that at least some retries happen.
+# The default settings enable 3 retries after 20 minutes each.
+boot_retry_timeout = 1200
+# images_path = /shared/html/tmp
+# instance_master_path = /shared/html/master_images
+tftp_master_path = {{ env.IRONIC_HOME }}/images/tftpboot/master_images
+tftp_root = {{ env.IRONIC_HOME }}/images/tftpboot
+kernel_append_params = nofb nomodeset vga=normal ipa-insecure=1 
+# This makes networking boot templates generated even for nodes using local
+# boot (the default), ensuring that they boot correctly even if they start
+# netbooting for some reason (e.g. with the noop management interface).
+enable_netboot_fallback = true
+# Enable the fallback path to ironic-inspector
+ipxe_fallback_script = inspector.ipxe
+
+[redfish]
+use_swift = false
+kernel_append_params = nofb nomodeset vga=normal ipa-insecure=1 
+
+[ilo]
+kernel_append_params = nofb nomodeset vga=normal ipa-insecure=1 
+
+[irmc]
+kernel_append_params = nofb nomodeset vga=normal ipa-insecure=1 
+
+[service_catalog]
+endpoint_override = {{ env.IRONIC_HOST_IP }}
+
+

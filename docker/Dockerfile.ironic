@@ -1,0 +1,10 @@
+FROM ubuntu:20.04
+
+RUN apt-get update && apt-get install -y python3-pip git ipmitool iproute2
+RUN git clone -b 20.2.0 https://github.com/openstack/ironic /opt/ironic
+
+COPY scripts/ironic/deps.txt /opt/ironic
+
+RUN cd /opt/ironic && pip install -r requirements.txt -r deps.txt && pip install .
+
+RUN rm -rf /opt/ironic

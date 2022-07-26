@@ -1,0 +1,8 @@
+proliantutils
+PyMySQL
+python-dracclient
+python-ibmcclient
+python-scciclient
+sushy-oem-idrac
+crudini
+gunicorn

@@ -3,6 +3,8 @@ K8S_VER=v1.24.1
 ETCD_VER=3.5.3-0
 DNS_VER=v1.8.6
 PAUSE_VER=3.7
+IRONIC_VER=20.2.0
+IRONIC_INSPECTOR_VER=10.12.0
 
 REL_PKGS="invetory sbin playbook bce.yaml bce-installer"
 REL_NAME=${BCE_VER}-linux-`uname -m`
@@ -35,6 +37,14 @@ coredns:
 
 pause:
 	docker build sbin -t openbce/pause:${PAUSE_VER} -f docker/Dockerfile.pause
+
+ironic:
+	docker build . -t openbce/ironic:${IRONIC_VER} -f docker/Dockerfile.ironic
+	docker build . -t openbce/ironic-inspector:${IRONIC_INSPECTOR_VER} -f docker/Dockerfile.ironic-inspector
+	docker build . -t openbce/ironic-init:${BCE_VER} -f docker/Dockerfile.ironic-init
+
+debug-tools:
+	docker build . -t openbce/debug:${BCE_VER} -f docker/Dockerfile.debug
 
 release:
 	mkdir -p build/bce-${BCE_VER}
