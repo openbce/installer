@@ -38,11 +38,6 @@ coredns:
 pause:
 	docker build sbin -t openbce/pause:${PAUSE_VER} -f docker/Dockerfile.pause
 
-ironic:
-	docker build . -t openbce/ironic:${IRONIC_VER} -f docker/Dockerfile.ironic
-	docker build . -t openbce/ironic-inspector:${IRONIC_INSPECTOR_VER} -f docker/Dockerfile.ironic-inspector
-	docker build . -t openbce/ironic-init:${BCE_VER} -f docker/Dockerfile.ironic-init
-
 debug-tools:
 	docker build . -t openbce/debug:${BCE_VER} -f docker/Dockerfile.debug
 

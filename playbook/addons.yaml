@@ -7,37 +7,9 @@
     - name: Install Calico
       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f {{ playbook_dir }}/templates/calico.yaml
 
-#     - name: Install mpi-operator
-#       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k "github.com/kubeflow/training-operator/manifests/overlays/standalone?ref=v1.4.0" 
-# 
-    - name: Create namespace for baremetal-operator
-      shell: ../sbin/kubectl create --kubeconfig {{ playbook_dir }}/config/kube.config namespace baremetal-operator-system
-# 
-#     - name: Create cert-manager
-#       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f https://github.com/jetstack/cert-manager/releases/download/v1.5.4/cert-manager.yaml
-# 
-#     - name: Wait for cert-manager pods running
-#       shell: "../sbin/kubectl get pods --namespace cert-manager --kubeconfig {{ playbook_dir }}/config/kube.config | grep Running "
-#       register: running_pod_num
-#       until: running_pod_num.stdout_lines | length > 2
-#       retries: 18
-#       delay: 10
-# 
-#     - name: Install cluster-api
-#       shell: ../sbin/clusterctl init --kubeconfig {{ playbook_dir }}/config/kube.config --infrastructure metal3 --core cluster-api:v{{ capi_version }} --bootstrap kubeadm:v{{ capi_version }} --control-plane kubeadm:v{{ capi_version }} -v5
-# 
-#     - name: Install baremetal-operator
-#       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k "https://github.com/metal3-io/baremetal-operator/config/default" 
-
     - name: Generate Metallb configuration
       template: src=templates/metallb-config.yaml.j2 dest=../kustomize/metallb/metallb-config.yaml
 
     - name: Install Metallb
       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/metallb
-
-    - name: Install MariaDB
-      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/mariadb
-
-    - name: Install Ironic
-      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/ironic
 

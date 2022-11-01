@@ -1,8 +1,0 @@
-CREATE DATABASE ironic CHARACTER SET utf8;
-GRANT ALL PRIVILEGES ON ironic.* TO 'ironic'@'localhost' IDENTIFIED BY '{{ env.MARIADB_PASSWORD }}';
-GRANT ALL PRIVILEGES ON ironic.* TO 'ironic'@'%' IDENTIFIED BY '{{ env.MARIADB_PASSWORD }}';
-
-CREATE DATABASE ironic-inspector CHARACTER SET utf8;
-GRANT ALL PRIVILEGES ON ironic-inspector.* TO 'ironic'@'localhost' IDENTIFIED BY '{{ env.MARIADB_PASSWORD }}';
-GRANT ALL PRIVILEGES ON ironic-inspector.* TO 'ironic'@'%' IDENTIFIED BY '{{ env.MARIADB_PASSWORD }}';
-

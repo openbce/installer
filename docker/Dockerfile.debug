@@ -3,15 +3,18 @@ FROM ubuntu:20.04
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-RUN apt-get update && apt-get install -y mysql-client jq vim iputils-ping curl openjdk-17-jdk build-essential git python3-pip ipmitool iproute2
+RUN apt-get update && apt-get install -y mysql-client jq vim iputils-ping curl openjdk-17-jdk build-essential git python3-pip \
+	ipmitool iproute2
 RUN apt-get autoclean && apt-get autoremove
 
 # Install kubectl
-RUN curl -L "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o /usr/bin/kubectl
+RUN curl -L -s "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" \
+	-o /usr/bin/kubectl
 RUN chmod +x /usr/bin/kubectl
 
 # Install ironic client
 RUN pip install python-ironicclient[cli]>=5.0.0
+RUN pip install python-ironic-inspector-client>=4.7.1
 
 # Setup baremetal client config
 RUN mkdir -p  /root/.config/openstack/
