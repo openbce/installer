@@ -1,6 +1,5 @@
 bce_version: 0.1
 k8s_version: 1.24.1
-capi_version: 1.1.5
 work_dir: /scrap/users/klausm
 image_repository: docker.io/openbce
 pod_cidr: 172.88.0.0/16
