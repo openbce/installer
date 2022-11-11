@@ -4408,7 +4408,7 @@ spec:
             - name: CLUSTER_TYPE
               value: "k8s,bgp"
             - name: IP_AUTODETECTION_METHOD
-              value: "interface=eno1"
+              value: "interface=ens9f0"
             # Auto-detect the BGP IP address.
             - name: IP
               value: "autodetect"

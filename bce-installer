@@ -44,8 +44,7 @@ function download_binaries() {
 
 download_binaries
 
-mkdir -p ../work playbook/config
-rm -rf ../work/mariadb
+mkdir -p playbook/config
 
 if [ `id -u` -ne 0 ];then
 	echo "bce-installer requires root permission"
