@@ -3,9 +3,18 @@
   hosts: localhost
   vars_files:
     - ../bce.yaml
+  vars:
+    dep_items: ["ovn-setup", "ovnkube-db", "ovnkube-master", "ovnkube-node"]
   tasks:
-    - name: Install Calico
-      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f {{ playbook_dir }}/templates/calico.yaml
+    - name: Generate OVN Configuration
+      template: src=templates/ovn/{{ item }}.yaml.j2 dest=../kustomize/ovn/{{ item }}.yaml
+      with_items: "{{ mod_items }}"
+
+    - name: Install OVN-Kubernetes
+      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/ovn
+
+#    - name: Install Calico
+#      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f {{ playbook_dir }}/templates/calico.yaml
 
     - name: Generate Metallb configuration
       template: src=templates/metallb-config.yaml.j2 dest=../kustomize/metallb/metallb-config.yaml
