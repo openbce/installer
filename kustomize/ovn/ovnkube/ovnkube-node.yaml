@@ -34,8 +34,17 @@ spec:
       hostNetwork: true
       dnsPolicy: Default
       hostPID: true
-      containers:
 
+      initContainers:
+      - name: cni
+        image: "openbce/cni:v1.1.1"
+        imagePullPolicy: "IfNotPresent"
+        command: ["/bin/sh", "-c", "cp /opt/bin/* /opt/cni/bin/"]
+        volumeMounts:
+        - mountPath: /opt/cni/bin
+          name: cni-dir
+
+      containers:
       - name: ovnkube-node
         image: "openbce/ovn-k8s:0.3.0"
         imagePullPolicy: "IfNotPresent"
@@ -347,6 +356,9 @@ spec:
       - name: host-var-lib-ovs
         hostPath:
           path: /var/lib/openvswitch
+      - name: cni-dir
+        hostPath:
+          path: /opt/cni/bin
 
       tolerations:
       - operator: "Exists"
