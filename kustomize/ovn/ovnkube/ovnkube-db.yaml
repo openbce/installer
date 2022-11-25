@@ -3,16 +3,17 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ovnkube-db
+  namespace: ovn-kubernetes
 spec:
   ports:
   - name: north
-    port: {{ ovn_nb_port }}
+    port: 6641
     protocol: TCP
-    targetPort: {{ ovn_nb_port }}
+    targetPort: 6641
   - name: south
-    port: {{ ovn_sb_port }}
+    port: 6642
     protocol: TCP
-    targetPort: {{ ovn_sb_port }}
+    targetPort: 6642
   sessionAffinity: None
   clusterIP: None
   type: ClusterIP
@@ -28,6 +29,7 @@ apiVersion: apps/v1
 metadata:
   name: ovnkube-db
   # namespace set up by install
+  namespace: ovn-kubernetes
   annotations:
     kubernetes.io/description: |
       This daemonset launches the OVN NB/SB ovsdb service components.
@@ -65,7 +67,9 @@ spec:
 
       # nb-ovsdb - v3
       - name: nb-ovsdb
-        image: "{{ ovn_image | default('docker.io/ovnkube/ovn-daemonset:latest') }}"
+        image: "openbce/ovn-k8s:0.3.0"
+        imagePullPolicy: "IfNotPresent"
+
         command: ["/root/ovnkube.sh", "nb-ovsdb"]
 
         securityContext:
@@ -102,7 +106,7 @@ spec:
         - name: OVN_DAEMONSET_VERSION
           value: "3"
         - name: OVN_LOGLEVEL_NB
-          value: "{{ ovn_loglevel_nb }}"
+          value: "-vconsole:info -vfile:info"
         - name: K8S_APISERVER
           valueFrom:
             configMapKeyRef:
@@ -117,9 +121,11 @@ spec:
             fieldRef:
               fieldPath: status.hostIP
         - name: OVN_SSL_ENABLE
-          value: "{{ ovn_ssl_en }}"
+          value: "no"
         - name: OVN_NB_PORT
-          value: "{{ ovn_nb_port }}"
+          value: "6641"
+        - name: ENABLE_IPSEC
+          value: "false"
         readinessProbe:
           exec:
             command: ["/usr/bin/ovn-kube-util", "readiness-probe", "-t", "ovnnb-db"]
@@ -130,8 +136,11 @@ spec:
 
       # sb-ovsdb - v3
       - name: sb-ovsdb
-        image: "{{ ovn_image | default('docker.io/ovnkube/ovn-daemonset:latest') }}"
+        image: "openbce/ovn-k8s:0.3.0"
+        imagePullPolicy: "IfNotPresent"
+
         command: ["/root/ovnkube.sh", "sb-ovsdb"]
+
         securityContext:
           runAsUser: 0
           capabilities:
@@ -166,7 +175,7 @@ spec:
         - name: OVN_DAEMONSET_VERSION
           value: "3"
         - name: OVN_LOGLEVEL_SB
-          value: "{{ ovn_loglevel_sb }}"
+          value: "-vconsole:info -vfile:info"
         - name: K8S_APISERVER
           valueFrom:
             configMapKeyRef:
@@ -181,9 +190,9 @@ spec:
             fieldRef:
               fieldPath: status.hostIP
         - name: OVN_SSL_ENABLE
-          value: "{{ ovn_ssl_en }}"
+          value: "no"
         - name: OVN_SB_PORT
-          value: "{{ ovn_sb_port }}"
+          value: "6642"
         readinessProbe:
           exec:
             command: ["/usr/bin/ovn-kube-util", "readiness-probe", "-t", "ovnsb-db"]

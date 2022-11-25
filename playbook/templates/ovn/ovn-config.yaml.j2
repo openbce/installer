@@ -1,0 +1,12 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: ovn-config
+data:
+  net_cidr:      "{{ pod_cidr }}"
+  svc_cidr:      "{{ service_cidr }}"
+  k8s_apiserver: "https://{{ k8s_endpoint }}"
+  mtu:           "1400"
+  host_network_namespace: "ovnkube-traffic-ns"
+

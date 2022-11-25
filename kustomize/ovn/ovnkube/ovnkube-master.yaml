@@ -6,12 +6,14 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: ovnkube-master
+  # namespace set up by install
+  namespace: ovn-kubernetes
   annotations:
     kubernetes.io/description: |
       This Deployment launches the ovn-kubernetes master networking components.
 spec:
   progressDeadlineSeconds: 600
-  replicas: {{ ovn_master_count | default(1|int) }}
+  replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -64,8 +66,11 @@ spec:
       containers:
       # ovn-northd - v3
       - name: ovn-northd
-        image: "{{ ovn_image | default('docker.io/ovnkube/ovn-daemonset:latest') }}"
+        image: "openbce/ovn-k8s:0.3.0"
+        imagePullPolicy: "IfNotPresent"
+
         command: ["/root/ovnkube.sh", "run-ovn-northd"]
+
         securityContext:
           runAsUser: 0
           capabilities:
@@ -97,7 +102,7 @@ spec:
         - name: OVN_DAEMONSET_VERSION
           value: "3"
         - name: OVN_LOGLEVEL_NORTHD
-          value: "{{ ovn_loglevel_northd }}"
+          value: "-vconsole:info -vfile:info"
         - name: K8S_APISERVER
           valueFrom:
             configMapKeyRef:
@@ -108,19 +113,24 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: OVN_SSL_ENABLE
-          value: "{{ ovn_ssl_en }}"
+          value: "no"
         readinessProbe:
           exec:
             command: ["/usr/bin/ovn-kube-util", "readiness-probe", "-t", "ovn-northd"]
           initialDelaySeconds: 30
           timeoutSeconds: 30
           periodSeconds: 60
+      # end of container
 
       - name: ovnkube-master
-        image: "{{ ovn_image | default('docker.io/ovnkube/ovn-daemonset:latest') }}"
+        image: "openbce/ovn-k8s:0.3.0"
+        imagePullPolicy: "IfNotPresent"
+
         command: ["/root/ovnkube.sh", "ovn-master"]
+
         securityContext:
           runAsUser: 0
+
         terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         # Run directories where we need to be able to access sockets
@@ -145,15 +155,15 @@ spec:
         - name: OVN_DAEMONSET_VERSION
           value: "3"
         - name: OVNKUBE_LOGLEVEL
-          value: "{{ ovnkube_master_loglevel }}"
+          value: "5"
         - name: OVNKUBE_LOGFILE_MAXSIZE
-          value: "{{ ovnkube_logfile_maxsize }}"
+          value: "100"
         - name: OVNKUBE_LOGFILE_MAXBACKUPS
-          value: "{{ ovnkube_logfile_maxbackups }}"
+          value: "5"
         - name: OVNKUBE_LOGFILE_MAXAGE
-          value: "{{ ovnkube_logfile_maxage }}"
+          value: "5"
         - name: OVNKUBE_CONFIG_DURATION_ENABLE
-          value: "{{ ovnkube_config_duration_enable }}"
+          value: ""
         - name: OVN_NET_CIDR
           valueFrom:
             configMapKeyRef:
@@ -182,33 +192,33 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: OVN_HYBRID_OVERLAY_ENABLE
-          value: "{{ ovn_hybrid_overlay_enable }}"
+          value: ""
         - name: OVN_EGRESSIP_ENABLE
-          value: "{{ ovn_egress_ip_enable }}"
+          value: ""
         - name: OVN_EGRESSIP_HEALTHCHECK_PORT
-          value: "{{ ovn_egress_ip_healthcheck_port }}"
+          value: ""
         - name: OVN_EGRESSFIREWALL_ENABLE
-          value: "{{ ovn_egress_firewall_enable }}"
+          value: ""
         - name: OVN_EGRESSQOS_ENABLE
-          value: "{{ ovn_egress_qos_enable }}"
+          value: ""
         - name: OVN_HYBRID_OVERLAY_NET_CIDR
-          value: "{{ ovn_hybrid_overlay_net_cidr }}"
+          value: ""
         - name: OVN_DISABLE_SNAT_MULTIPLE_GWS
-          value: "{{ ovn_disable_snat_multiple_gws }}"
+          value: ""
         - name: OVN_EMPTY_LB_EVENTS
-          value: "{{ ovn_empty_lb_events }}"
+          value: ""
         - name: OVN_V4_JOIN_SUBNET
-          value: "{{ ovn_v4_join_subnet }}"
+          value: ""
         - name: OVN_V6_JOIN_SUBNET
-          value: "{{ ovn_v6_join_subnet }}"
+          value: ""
         - name: OVN_SSL_ENABLE
-          value: "{{ ovn_ssl_en }}"
+          value: "no"
         - name: OVN_GATEWAY_MODE
-          value: "{{ ovn_gateway_mode }}"
+          value: "local"
         - name: OVN_MULTICAST_ENABLE
-          value: "{{ ovn_multicast_enable }}"
+          value: ""
         - name: OVN_ACL_LOGGING_RATE_LIMIT
-          value: "{{ ovn_acl_logging_rate_limit }}"
+          value: "20"
         - name: OVN_HOST_NETWORK_NAMESPACE
           valueFrom:
             configMapKeyRef:

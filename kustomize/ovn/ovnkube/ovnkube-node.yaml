@@ -1,10 +1,14 @@
 ---
+# ovnkube-node
+# daemonset version 3
 # starts node daemons for ovn, each in a separate container
 # it is run on all nodes
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: ovnkube-node
+  # namespace set up by install
+  namespace: ovn-kubernetes
   annotations:
     kubernetes.io/description: |
       This DaemonSet launches the ovn-kubernetes networking components for worker nodes.
@@ -33,11 +37,16 @@ spec:
       containers:
 
       - name: ovnkube-node
-        image: "{{ ovn_image | default('docker.io/ovnkube/ovn-daemonset:latest') }}"
+        image: "openbce/ovn-k8s:0.3.0"
+        imagePullPolicy: "IfNotPresent"
+
         command: ["/root/ovnkube.sh", "ovn-node"]
+
         securityContext:
           runAsUser: 0
           privileged: true
+          
+
         terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         # Common mounts
@@ -61,6 +70,7 @@ spec:
         - mountPath: /var/run/netns
           name: host-netns
           mountPropagation: Bidirectional
+        # ovnkube-node only mounts (non dpu related)
         - mountPath: /var/run/openvswitch/
           name: host-var-run-ovs
         - mountPath: /var/run/ovn/
@@ -83,13 +93,17 @@ spec:
         - name: OVN_DAEMONSET_VERSION
           value: "3"
         - name: OVNKUBE_LOGLEVEL
-          value: "{{ ovnkube_node_loglevel }}"
+          value: "5"
         - name: OVNKUBE_LOGFILE_MAXSIZE
-          value: "{{ ovnkube_logfile_maxsize }}"
+          value: "100"
         - name: OVNKUBE_LOGFILE_MAXBACKUPS
-          value: "{{ ovnkube_logfile_maxbackups }}"
+          value: "5"
         - name: OVNKUBE_LOGFILE_MAXAGE
-          value: "{{ ovnkube_logfile_maxage }}"
+          value: "5"
+        - name: OVN_KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
         - name: OVN_NET_CIDR
           valueFrom:
             configMapKeyRef:
@@ -125,61 +139,61 @@ spec:
             fieldRef:
               fieldPath: status.hostIP
         - name: OVN_GATEWAY_MODE
-          value: "{{ ovn_gateway_mode }}"
+          value: "local"
         - name: OVN_GATEWAY_OPTS
-          value: "{{ ovn_gateway_opts }}"
+          value: ""
         - name: OVN_HYBRID_OVERLAY_ENABLE
-          value: "{{ ovn_hybrid_overlay_enable }}"
+          value: ""
         - name: OVN_EGRESSIP_ENABLE
-          value: "{{ ovn_egress_ip_enable }}"
+          value: ""
         - name: OVN_EGRESSIP_HEALTHCHECK_PORT
-          value: "{{ ovn_egress_ip_healthcheck_port }}"
+          value: ""
         - name: OVN_HYBRID_OVERLAY_NET_CIDR
-          value: "{{ ovn_hybrid_overlay_net_cidr }}"
+          value: ""
         - name: OVN_DISABLE_SNAT_MULTIPLE_GWS
-          value: "{{ ovn_disable_snat_multiple_gws }}"
+          value: ""
         - name: OVN_DISABLE_PKT_MTU_CHECK
-          value: "{{ ovn_disable_pkt_mtu_check }}"
+          value: ""
         - name: OVN_NETFLOW_TARGETS
-          value: "{{ ovn_netflow_targets }}"
+          value: ""
         - name: OVN_SFLOW_TARGETS
-          value: "{{ ovn_sflow_targets }}"
+          value: ""
         - name: OVN_IPFIX_TARGETS
-          value: "{{ ovn_ipfix_targets }}"
+          value: ""
         - name: OVN_IPFIX_SAMPLING
-          value: "{{ ovn_ipfix_sampling }}"
+          value: ""
         - name: OVN_IPFIX_CACHE_MAX_FLOWS
-          value: "{{ ovn_ipfix_cache_max_flows }}"
+          value: ""
         - name: OVN_IPFIX_CACHE_ACTIVE_TIMEOUT
-          value: "{{ ovn_ipfix_cache_active_timeout }}"
+          value: ""
         - name: OVN_V4_JOIN_SUBNET
-          value: "{{ ovn_v4_join_subnet }}"
+          value: ""
         - name: OVN_V6_JOIN_SUBNET
-          value: "{{ ovn_v6_join_subnet }}"
+          value: ""
         - name: OVN_MULTICAST_ENABLE
-          value: "{{ ovn_multicast_enable }}"
+          value: ""
         - name: OVN_UNPRIVILEGED_MODE
-          value: "{{ ovn_unprivileged_mode }}"
+          value: "no"
         - name: OVN_EX_GW_NETWORK_INTERFACE
-          value: "{{ ovn_ex_gw_networking_interface }}"
+          value: ""
         - name: OVN_SSL_ENABLE
-          value: "{{ ovn_ssl_en }}"
+          value: "no"
         - name: OVN_DISABLE_OVN_IFACE_ID_VER
-          value: "{{ ovn_disable_ovn_iface_id_ver }}"
+          value: "false"
         - name: OVN_REMOTE_PROBE_INTERVAL
-          value: "{{ ovn_remote_probe_interval }}"
+          value: "100000"
         - name: OVN_MONITOR_ALL
-          value: "{{ ovn_monitor_all }}"
+          value: ""
         - name: OVN_OFCTRL_WAIT_BEFORE_CLEAR
-          value: "{{ ovn_ofctrl_wait_before_clear }}"
+          value: ""
         - name: OVN_ENABLE_LFLOW_CACHE
-          value: "{{ ovn_enable_lflow_cache }}"
+          value: ""
         - name: OVN_LFLOW_CACHE_LIMIT
-          value: "{{ ovn_lflow_cache_limit }}"
+          value: ""
         - name: OVN_LFLOW_CACHE_LIMIT_KB
-          value: "{{ ovn_lflow_cache_limit_kb }}"
+          value: ""
         - name: OVNKUBE_NODE_MGMT_PORT_NETDEV
-          value: "{{ ovnkube_node_mgmt_port_netdev }}"
+          value: ""
         - name: OVN_HOST_NETWORK_NAMESPACE
           valueFrom:
             configMapKeyRef:
@@ -194,8 +208,11 @@ spec:
           periodSeconds: 60
 
       - name: ovn-controller
-        image: "{{ ovn_image | default('docker.io/ovnkube/ovn-daemonset:latest') }}"
+        image: "openbce/ovn-k8s:0.3.0"
+        imagePullPolicy: "IfNotPresent"
+
         command: ["/root/ovnkube.sh", "ovn-controller"]
+
         securityContext:
           runAsUser: 0
           capabilities:
@@ -226,7 +243,7 @@ spec:
         - name: OVN_DAEMONSET_VERSION
           value: "3"
         - name: OVN_LOGLEVEL_CONTROLLER
-          value: "{{ ovn_loglevel_controller }}"
+          value: "-vconsole:info"
         - name: K8S_APISERVER
           valueFrom:
             configMapKeyRef:
@@ -237,7 +254,7 @@ spec:
             fieldRef:
               fieldPath: metadata.namespace
         - name: OVN_SSL_ENABLE
-          value: "{{ ovn_ssl_en }}"
+          value: "no"
 
         readinessProbe:
           exec:
@@ -248,8 +265,11 @@ spec:
 
         # ovs-metrics-exporter - v3
       - name: ovs-metrics-exporter
-        image: "{{ ovn_image | default('docker.io/ovnkube/ovn-daemonset:latest') }}"
+        image: "openbce/ovn-k8s:0.3.0"
+        imagePullPolicy: "IfNotPresent"
+
         command: ["/root/ovnkube.sh", "ovs-metrics"]
+
         securityContext:
           runAsUser: 0
           capabilities:
@@ -277,6 +297,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.hostIP
+        # end of container
       nodeSelector:
         kubernetes.io/os: "linux"
       affinity:

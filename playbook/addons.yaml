@@ -3,13 +3,10 @@
   hosts: localhost
   vars_files:
     - ../bce.yaml
-  vars:
-    dep_items: ["ovn-setup", "ovnkube-db", "ovnkube-master", "ovnkube-node"]
   tasks:
     - name: Generate OVN Configuration
-      template: src=templates/ovn/{{ item }}.yaml.j2 dest=../kustomize/ovn/{{ item }}.yaml
-      with_items: "{{ mod_items }}"
-
+      template: src=templates/ovn/ovn-config.yaml.j2 dest=../kustomize/ovn/ovnkube/ovn-config.yaml
+    
     - name: Install OVN-Kubernetes
       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/ovn
 

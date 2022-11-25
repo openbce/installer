@@ -73,6 +73,16 @@ rules:
   resources:
   - customresourcedefinitions
   verbs: ["list", "get", "watch"]
+- apiGroups:
+  - certificates.k8s.io
+  resources:
+  - certificatesigningrequests
+  verbs:
+  - create
+  - get
+  - list
+  - watch
+  - delete
 
 
 ---
@@ -87,7 +97,6 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: ovn
-  namespace: ovn-kubernetes
 
 ---
 
@@ -123,29 +132,4 @@ subjects:
 - kind: ServiceAccount
   name: ovn
 
----
 
-# The network cidr and service cidr are set in the ovn-config configmap
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: ovn-config
-data:
-  net_cidr:      "{{ pod_cidr }}"
-  svc_cidr:      "{{ service_cidr }}"
-  k8s_apiserver: "{{ k8s_apiserver }}"
-  mtu:           "{{ mtu_value }}"
-  host_network_namespace: "ovn-k8s-traffic-ns"
-
----
-# ovn-host-network-namespace.yaml
-#
-# Create the namespace for classifying host network traffic.
-#
-# This provisioning is done as part of installation after the cluster is
-# up and before the ovn daemonsets are created.
-
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: ovn-k8s-traffic-ns

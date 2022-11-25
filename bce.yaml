@@ -1,53 +1,13 @@
 bce_version: 0.1
 k8s_version: 1.24.1
+k8s_endpoint: 10.210.0.163:6443
 work_dir: /scrap/users/klausm
 image_repository: docker.io/openbce
 pod_cidr: 172.88.0.0/16
 service_cidr: 172.96.0.0/12
-lb_ip_range: 10.210.0.9-10.210.0.12
+
+# lb_ip_range: 10.210.0.9-10.210.0.12
+lb_ip_range: 192.168.0.50-192.168.0.90
 
 
-# OVN Configurations
-ovn_image: openbce/ovn-k8s:v0.3.0
-ovn_unprivileged_mode: false
-ovn_gateway_mode: ${ovn_gateway_mode} 
-ovn_gateway_opts: ${ovn_gateway_opts} 
-ovnkube_node_loglevel: ${node_loglevel} 
-ovn_loglevel_controller: ${ovn_loglevel_controller} 
-ovnkube_logfile_maxsize: ${ovnkube_logfile_maxsize} 
-ovnkube_logfile_maxbackups: ${ovnkube_logfile_maxbackups} 
-ovnkube_logfile_maxage: ${ovnkube_logfile_maxage} 
-ovn_hybrid_overlay_net_cidr: ${ovn_hybrid_overlay_net_cidr} 
-ovn_hybrid_overlay_enable: ${ovn_hybrid_overlay_enable} 
-ovn_disable_snat_multiple_gws: ${ovn_disable_snat_multiple_gws} 
-ovn_disable_pkt_mtu_check: ${ovn_disable_pkt_mtu_check} 
-ovn_v4_join_subnet: ${ovn_v4_join_subnet} 
-ovn_v6_join_subnet: ${ovn_v6_join_subnet} 
-ovn_multicast_enable: ${ovn_multicast_enable} 
-ovn_egress_ip_enable: ${ovn_egress_ip_enable} 
-ovn_egress_ip_healthcheck_port: ${ovn_egress_ip_healthcheck_port} 
-ovn_ssl_en: ${ovn_ssl_en} 
-ovn_remote_probe_interval: ${ovn_remote_probe_interval} 
-ovn_monitor_all: ${ovn_monitor_all} 
-ovn_ofctrl_wait_before_clear: ${ovn_ofctrl_wait_before_clear} 
-ovn_enable_lflow_cache: ${ovn_enable_lflow_cache} 
-ovn_lflow_cache_limit: ${ovn_lflow_cache_limit} 
-ovn_lflow_cache_limit_kb: ${ovn_lflow_cache_limit_kb} 
-ovn_netflow_targets: ${ovn_netflow_targets} 
-ovn_sflow_targets: ${ovn_sflow_targets} 
-ovn_ipfix_targets: ${ovn_ipfix_targets} 
-ovn_ipfix_sampling: ${ovn_ipfix_sampling} 
-ovn_ipfix_cache_max_flows: ${ovn_ipfix_cache_max_flows} 
-ovn_ipfix_cache_active_timeout: ${ovn_ipfix_cache_active_timeout} 
-ovn_ex_gw_networking_interface: ${ovn_ex_gw_networking_interface} 
-ovn_disable_ovn_iface_id_ver: ${ovn_disable_ovn_iface_id_ver} 
-ovnkube_node_mgmt_port_netdev: ${ovnkube_node_mgmt_port_netdev} 
-ovnkube_app_name: ovnkube-node 
 
-
-net_cidr=${net_cidr}
-svc_cidr=${svc_cidr} 
-mtu_value=${mtu}
-k8s_apiserver=${k8s_apiserver} 
-host_network_namespace=${host_network_namespace} 
-in_upgrade=${in_upgrade} 

@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ovn-kubernetes
+resources:
+  - ovn-setup.yaml
+  - ovn-config.yaml
+  - ovnkube-db.yaml
+  - ovnkube-master.yaml
+  - ovnkube-node.yaml
+  - ovs-node.yaml
+  - namespace.yaml
