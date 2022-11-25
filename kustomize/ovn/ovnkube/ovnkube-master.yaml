@@ -63,14 +63,6 @@ spec:
                       - ovnkube-master
               topologyKey: kubernetes.io/hostname
 
-      initContainers:
-      - name: cni
-        image: "openbce/cni:v1.1.1"
-        imagePullPolicy: "IfNotPresent"
-        command: ["/bin/sh", "-c", "cp /opt/bin/* /opt/cni/bin/"]
-        volumeMounts:
-        - mountPath: /opt/cni/bin
-          name: cni-dir
       containers:
       # ovn-northd - v3
       - name: ovn-northd
@@ -252,8 +244,5 @@ spec:
         hostPath:
           path: /etc/ovn
           type: DirectoryOrCreate
-      - name: cni-dir
-        hostPath:
-          path: /opt/cni/bin
       tolerations:
       - operator: "Exists"
