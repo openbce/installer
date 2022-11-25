@@ -1,5 +1,5 @@
 [masters]
-master_host
+10.210.0.163
 
 [workers]
-worker_host
+10.210.0.153

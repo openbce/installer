@@ -1,0 +1,12 @@
+---
+# ovn-host-network-namespace.yaml
+#
+# Create the namespace for classifying host network traffic.
+#
+# This provisioning is done as part of installation after the cluster is
+# up and before the ovn daemonsets are created.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ovnkube-traffic-ns

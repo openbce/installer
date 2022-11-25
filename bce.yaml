@@ -1,7 +1,13 @@
 bce_version: 0.1
 k8s_version: 1.24.1
+k8s_endpoint: 10.210.0.163:6443
 work_dir: /scrap/users/klausm
 image_repository: docker.io/openbce
 pod_cidr: 172.88.0.0/16
 service_cidr: 172.96.0.0/12
-lb_ip_range: 10.210.0.9-10.210.0.12
+
+# lb_ip_range: 10.210.0.9-10.210.0.12
+lb_ip_range: 192.168.0.50-192.168.0.90
+
+
+
