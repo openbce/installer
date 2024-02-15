@@ -1,57 +1,14 @@
 #!/bin/bash
 
 # environment
-binary_dir=sbin
-k8s_version=v1.24.4
-cri_version=v1.24.2
-clusterctl_version=v1.2.1
-helm_version=v3.10.0
 
-# download bce binaries
-function download_binaries() {
-  if [ ! -d "$binary_dir" ]; then
-    mkdir $binary_dir
-  fi
-
-  if [ ! -f "$binary_dir/kubeadm" ]; then
-    curl -s -L -o $binary_dir/kubeadm https://dl.k8s.io/$k8s_version/bin/linux/amd64/kubeadm && chmod 755 $binary_dir/kubeadm
-  fi
-
-  if [ ! -f "$binary_dir/kubelet" ]; then
-    curl -s -L -o $binary_dir/kubelet https://dl.k8s.io/$k8s_version/bin/linux/amd64/kubelet && chmod 755 $binary_dir/kubelet
-  fi
-
-  if [ ! -f "$binary_dir/kubectl" ]; then
-    curl -s -L -o $binary_dir/kubectl https://dl.k8s.io/$k8s_version/bin/linux/amd64/kubectl && chmod 755 $binary_dir/kubectl
-  fi
-
-  if [ ! -f "$binary_dir/crictl" ]; then
-    curl -s -L -o $binary_dir/crictl.tar.gz https://github.com/kubernetes-sigs/cri-tools/releases/download/$cri_version/crictl-$cri_version-linux-amd64.tar.gz
-    tar zxf $binary_dir/crictl.tar.gz -C $binary_dir
-    chmod 755 $binary_dir/crictl
-  fi
-
-  if [ ! -f "$binary_dir/clusterctl" ]; then
-    curl -s -L -o $binary_dir/clusterctl https://github.com/kubernetes-sigs/cluster-api/releases/download/$clusterctl_version/clusterctl-linux-amd64 && chmod 755 $binary_dir/clusterctl
-  fi
-
-  if [ ! -f "$binary_dir/helm" ]; then
-    curl -s -L -o $binary_dir/helm.tar.gz https://get.helm.sh/helm-$helm_version-linux-amd64.tar.gz
-    tar zxf $binary_dir/helm.tar.gz -C $binary_dir
-    mv $binary_dir/linux-amd64/helm $binary_dir
-  fi
-}
-
-download_binaries
-
-mkdir -p playbook/config
 
 if [ `id -u` -ne 0 ];then
 	echo "bce-installer requires root permission"
 	exit 1
 fi
 
-for i in "prepare" "master" "worker" "addons" 
+for i in "download" "prepare" "master" "worker" "addons"
 do
   ansible-playbook -i invetory/hosts playbook/${i}.yaml
 

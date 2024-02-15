@@ -5,7 +5,7 @@
     - ../bce.yaml
   vars:
     dep_items: ["socat", "conntrack", "ebtables", "containerd"]
-    sbin_items: ["kubelet", "crictl", "kubectl", "kubeadm", "clusterctl", "helm"]
+    sbin_items: ["kubelet", "crictl", "kubectl", "kubeadm"]
     mod_items: ["overlay", "br_netfilter", "nf_conntrack_tftp", "nf_nat_tftp"]
   tasks:
   - name: Make working directory
@@ -43,6 +43,11 @@
     service: name=containerd state=restarted
 
   # Setup kubelet
+  - name: Create kubelet manifests directory
+    file:
+      path: "/etc/kubernetes/manifests"
+      state: directory
+      mode: '0755'
   - name: Copy kubelet service
     copy: src=templates/kubelet.service dest=/etc/systemd/system/kubelet.service owner=root group=root mode=0644
   - name: Enable kubelet

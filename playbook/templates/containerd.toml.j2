@@ -2,6 +2,5 @@
 
 root="{{ work_dir }}/containerd"
 
-[plugins]
-  [plugins.cri]
-    sandbox_image = "docker.io/openbce/pause:3.7"
+[grpc]
+  address = "/run/containerd/containerd.sock"

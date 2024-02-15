@@ -8,14 +8,11 @@
       shell: kubeadm reset --force
 
     - name: Pull Images
-      shell: kubeadm config images pull  \
-          --kubernetes-version={{ k8s_version }} \
-          --image-repository={{ image_repository }}
+      shell: kubeadm config images pull
 
     - name: Install Kubernetes Master
       shell: kubeadm init \
-        --kubernetes-version={{ k8s_version }} \
-        --image-repository={{ image_repository }} \
+        --cri-socket="/run/containerd/containerd.sock" \
         --pod-network-cidr={{ pod_cidr }} \
         --apiserver-advertise-address={{ inventory_hostname }} \
         --service-cidr={{ service_cidr }}
@@ -25,6 +22,11 @@
   vars_files:
     - ../bce.yaml
   tasks:
+    - name: Create configuration directory  
+      file:
+        path: "{{ playbook_dir }}/config"
+        state: directory
+        mode: '0755'
     - name: Generate Worker tokens
       shell: kubeadm token create $(kubeadm token generate) --kubeconfig /etc/kubernetes/admin.conf --print-join-command > /etc/kubernetes/worker.conf
       async: 300 # Maximum allowed time in Seconds
@@ -35,15 +37,6 @@
 
     - name: Fetch kubeconfig
       fetch: src=/etc/kubernetes/admin.conf dest={{ playbook_dir }}/config/kube.config flat=yes
-
-- name: Remove taint from master node
-  hosts: localhost
-  vars_files:
-    - ../bce.yaml
-  tasks:
-    - name: Remove taint from master node
-      shell: ../sbin/kubectl taint no --all --kubeconfig {{ playbook_dir }}/config/kube.config {{ item }}
-      with_items: ["node-role.kubernetes.io/control-plane:NoSchedule-", "node-role.kubernetes.io/master:NoSchedule-"]
 
 
 

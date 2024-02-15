@@ -1,0 +1,40 @@
+---
+- name: Download binaries
+  hosts: localhost
+  vars_files:
+    - ../bce.yaml
+  tasks:
+    - name: Create binary directory  
+      file:
+        path: "../{{ binary_dir }}"
+        state: directory
+        mode: '0755'
+    - name: Download kubeadm
+      get_url:
+        url: "https://dl.k8s.io/{{ k8s_version }}/bin/linux/amd64/kubeadm"
+        dest: "../{{ binary_dir }}/kubeadm"
+        mode: 0755
+
+    - name: Download kubelet
+      get_url:
+        url: "https://dl.k8s.io/{{ k8s_version }}/bin/linux/amd64/kubelet"
+        dest: "../{{ binary_dir }}/kubelet"
+        mode: 0755
+
+    - name: Download kubectl
+      get_url:
+        url: "https://dl.k8s.io/{{ k8s_version }}/bin/linux/amd64/kubectl"
+        dest: "../{{ binary_dir }}/kubectl"
+        mode: 0755
+
+    - name: Download crictl
+      unarchive:
+        src: "https://github.com/kubernetes-sigs/cri-tools/releases/download/{{ cri_version }}/crictl-{{ cri_version }}-linux-amd64.tar.gz"
+        dest: "../{{ binary_dir }}"
+        remote_src: yes
+
+    - name: Download Cilium
+      unarchive:
+        src: "https://github.com/cilium/cilium-cli/releases/download/{{ cilium_version }}/cilium-linux-amd64.tar.gz"
+        dest: "../{{ binary_dir }}"
+        remote_src: yes
