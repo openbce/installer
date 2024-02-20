@@ -12,7 +12,6 @@
 
     - name: Install Kubernetes Master
       shell: kubeadm init \
-        --cri-socket="/run/containerd/containerd.sock" \
         --pod-network-cidr={{ pod_cidr }} \
         --apiserver-advertise-address={{ inventory_hostname }} \
         --service-cidr={{ service_cidr }}
