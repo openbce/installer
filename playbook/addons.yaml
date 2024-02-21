@@ -6,12 +6,3 @@
   tasks:
     - name: Install Cilium
       shell: ../sbin/cilium install
-
-# - name: Remove taint from master node
-#   hosts: localhost
-#   vars_files:
-#     - ../bce.yaml
-#   tasks:
-#     - name: Remove taint from master node
-#       shell: ../sbin/kubectl taint no --all --kubeconfig {{ playbook_dir }}/config/kube.config {{ item }}
-#       with_items: ["node-role.kubernetes.io/control-plane:NoSchedule-", "node-role.kubernetes.io/master:NoSchedule-"]
