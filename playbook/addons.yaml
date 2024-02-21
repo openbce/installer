@@ -6,3 +6,6 @@
   tasks:
     - name: Install Cilium
       shell: ../sbin/cilium install
+
+    - name: Install cert-manager
+      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
