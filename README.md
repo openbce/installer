@@ -21,10 +21,15 @@ sudo bce-installer
 ## Configurations
 
 ```
-bce-version: 1.0
-kubernetes-version: 1.24.1
-work_dir: /scrap/users/klausm
-image-repository: docker.io/openbce
-pod-network-cidr: 172.88.0.0/16
-service-cidr: 172.96.0.0/12
+bce_version: 0.1
+k8s_version: v1.29.1
+cri_version: v1.29.0
+cilium_version: v0.15.21
+
+work_dir: /opt/openbce
+binary_dir: sbin
+config_dir: config
+
+pod_cidr: 172.88.0.0/16
+service_cidr: 172.96.0.0/12
 ```
