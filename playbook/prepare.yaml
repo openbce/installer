@@ -6,10 +6,16 @@
   vars:
     dep_items: ["socat", "conntrack", "ebtables", "containerd"]
     sbin_items: ["kubelet", "crictl", "kubectl", "kubeadm"]
-    mod_items: ["overlay", "br_netfilter", "nf_conntrack_tftp", "nf_nat_tftp"]
+    mod_items: ["overlay", "br_netfilter"]
   tasks:
+  - name: Upgrade OS
+    apt:
+      upgrade: dist
+      update_cache: yes
+
   - name: Make working directory
     file: path={{work_dir}} state=directory mode=0755 force=true
+
   # Deploy openBCE binaries
   - name: Deploy binaries
     copy: src=../sbin/{{ item }} dest=/usr/bin/{{ item }} owner=root group=root mode=0755

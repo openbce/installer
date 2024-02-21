@@ -4,23 +4,14 @@
   vars_files:
     - ../bce.yaml
   tasks:
-    # - name: Generate OVN Configuration
-    #   template: src=templates/ovn-config.yaml.j2 dest=../kustomize/ovn/ovnkube/ovn-config.yaml
-    
-    # - name: Install OVN-Kubernetes
-    #   shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/ovn
+    - name: Install Cilium
+      shell: ../sbin/cilium install
 
-    # - name: Generate Metallb configuration
-    #   template: src=templates/metallb-config.yaml.j2 dest=../kustomize/metallb/metallb-config.yaml
-
-    # - name: Install Metallb
-    #   shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/metallb
-
-- name: Remove taint from master node
-  hosts: localhost
-  vars_files:
-    - ../bce.yaml
-  tasks:
-    - name: Remove taint from master node
-      shell: ../sbin/kubectl taint no --all --kubeconfig {{ playbook_dir }}/config/kube.config {{ item }}
-      with_items: ["node-role.kubernetes.io/control-plane:NoSchedule-", "node-role.kubernetes.io/master:NoSchedule-"]
+# - name: Remove taint from master node
+#   hosts: localhost
+#   vars_files:
+#     - ../bce.yaml
+#   tasks:
+#     - name: Remove taint from master node
+#       shell: ../sbin/kubectl taint no --all --kubeconfig {{ playbook_dir }}/config/kube.config {{ item }}
+#       with_items: ["node-role.kubernetes.io/control-plane:NoSchedule-", "node-role.kubernetes.io/master:NoSchedule-"]

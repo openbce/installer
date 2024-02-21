@@ -37,5 +37,7 @@
     - name: Fetch kubeconfig
       fetch: src=/etc/kubernetes/admin.conf dest={{ playbook_dir }}/config/kube.config flat=yes
 
+    - name: Configure kubectl
+      fetch: src=/etc/kubernetes/admin.conf dest=~/.kube/config flat=yes
 
 

@@ -33,7 +33,7 @@
         dest: "../{{ binary_dir }}"
         remote_src: yes
 
-    - name: Download Cilium
+    - name: Download cilium
       unarchive:
         src: "https://github.com/cilium/cilium-cli/releases/download/{{ cilium_version }}/cilium-linux-amd64.tar.gz"
         dest: "../{{ binary_dir }}"
