@@ -10,4 +10,4 @@
       shell: kubeadm reset --force
 
     - name: Install Worker
-      shell: "{{ worker_join_cmd }}"
+      shell: "{{ worker_join_cmd }} --cri-socket unix:///run/containerd/containerd.sock"
