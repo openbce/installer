@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dpu-nginx
+spec:
+  runtimeClassName: xpu
+  containers:
+  - name: dpu-nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
