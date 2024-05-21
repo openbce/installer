@@ -10,5 +10,8 @@
     - name: Install cert-manager
       shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f https://github.com/cert-manager/cert-manager/releases/download/v1.14.2/cert-manager.yaml
 
-    - name: Install NMState
-      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/nmstate/{{ nmstate_version }}/
+        #    - name: Install NMState
+        #      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -k ../kustomize/nmstate/{{ nmstate_version }}/
+
+    - name: Install Volcano
+      shell: ../sbin/kubectl apply --kubeconfig {{ playbook_dir }}/config/kube.config -f https://raw.githubusercontent.com/volcano-sh/volcano/release-1.9/installer/volcano-development.yaml
