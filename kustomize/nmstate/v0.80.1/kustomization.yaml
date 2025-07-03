@@ -1,8 +1,0 @@
-resources:
-- nmstate.io_nmstates.yaml
-- namespace.yaml
-- service_account.yaml
-- role.yaml
-- role_binding.yaml
-- operator.yaml
-- nmstate.yaml

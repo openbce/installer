@@ -22,9 +22,9 @@ sudo bce-installer
 
 ```
 bce_version: 0.1
-k8s_version: v1.29.1
-cri_version: v1.29.0
-cilium_version: v0.15.21
+k8s_version: v1.33.0
+cri_version: v1.33.0
+cilium_version: v1.17.5
 
 work_dir: /opt/openbce
 binary_dir: sbin
